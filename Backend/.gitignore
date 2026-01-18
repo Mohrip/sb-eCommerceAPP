@@ -55,3 +55,4 @@ logs/
 
 # Ignore environment variables file
 .env
+.env
