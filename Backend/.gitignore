@@ -15,6 +15,7 @@ target/
 ### IntelliJ IDEA ###
 Backend/.idea
 Backend/.idea/
+.idea/
 *.iml
 *.ipr
 out/
