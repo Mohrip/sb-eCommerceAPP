@@ -19,8 +19,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "products")
-@ToString
+@Table(name = "products", indexes = {
+    @Index(name = "idx_product_name", columnList = "productName"),
+    @Index(name = "idx_product_category", columnList = "category_id")
+})
+@ToString(exclude = {"products", "user", "category"})
 public class Product {
 
     @Id
@@ -41,12 +44,12 @@ public class Product {
     private double specialPrice;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id")
     private User user;
 

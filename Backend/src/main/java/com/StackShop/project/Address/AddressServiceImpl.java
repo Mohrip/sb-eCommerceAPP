@@ -35,7 +35,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDTO> getAddresses() {
-        List<Address> addresses = addressRepository.findAll();
+        // Use optimized query with JOIN FETCH to avoid N+1 problem
+        List<Address> addresses = addressRepository.findAllWithUser();
         return addresses.stream()
                 .map(address -> modelMapper.map(address, AddressDTO.class))
                 .toList();

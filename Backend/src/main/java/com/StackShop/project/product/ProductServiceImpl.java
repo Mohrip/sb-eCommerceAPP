@@ -48,7 +48,8 @@ private ModelMapper modelMapper;
 
     @Override
     public ProductResponse getAllProducts() {
-        List<Product> products = productRepository.findAll();
+        // Use optimized query with JOIN FETCH to avoid N+1 problem
+        List<Product> products = productRepository.findAllWithCategory();
         List<ProductDTO> productDTOs = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .collect(Collectors.toList());
