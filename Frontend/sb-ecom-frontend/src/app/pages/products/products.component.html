@@ -1,0 +1,65 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Products</h1>
+
+  <!-- Filters -->
+  <div class="flex flex-col md:flex-row gap-4 mb-8">
+    <div class="flex-1">
+      <input type="text" [(ngModel)]="searchKeyword" (keyup.enter)="onSearch()"
+        placeholder="Search products..."
+        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" />
+    </div>
+    <button (click)="onSearch()"
+      class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">Search</button>
+    <select [(ngModel)]="selectedCategory" (ngModelChange)="onCategoryChange()"
+      class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+      <option [ngValue]="0">All Categories</option>
+      @for (cat of categories; track cat.categoryId) {
+        <option [ngValue]="cat.categoryId">{{ cat.categoryName }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Products Grid -->
+  @if (loading) {
+    <div class="text-center py-20 text-gray-400 text-lg">Loading products...</div>
+  } @else if (filteredProducts.length === 0) {
+    <div class="text-center py-20 text-gray-400 text-lg">No products found.</div>
+  } @else {
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      @for (product of filteredProducts; track product.productId) {
+        <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+          <div class="h-48 bg-gray-200 flex items-center justify-center">
+            @if (product.image && product.image !== 'default.png') {
+              <img [src]="'http://localhost:5000/images/' + product.image" [alt]="product.productName"
+                class="h-full w-full object-cover" />
+            } @else {
+              <span class="text-6xl">🛍️</span>
+            }
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-800 truncate">{{ product.productName }}</h3>
+            <p class="text-sm text-gray-500 mt-1 line-clamp-2">{{ product.description }}</p>
+            <div class="mt-2 text-xs text-gray-400">Stock: {{ product.quantity }}</div>
+            <div class="flex items-center justify-between mt-3">
+              <div>
+                @if (product.discount > 0) {
+                  <span class="text-sm text-gray-400 line-through">${{ product.price }}</span>
+                  <span class="text-lg font-bold text-indigo-600 ml-1">${{ product.specialPrice }}</span>
+                  <span class="text-xs text-green-600 ml-1">-{{ product.discount }}%</span>
+                } @else {
+                  <span class="text-lg font-bold text-indigo-600">${{ product.price }}</span>
+                }
+              </div>
+              @if (auth.isLoggedIn()) {
+                <button (click)="addToCart(product.productId)"
+                  class="bg-indigo-600 text-white text-sm px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition">
+                  Add to Cart
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

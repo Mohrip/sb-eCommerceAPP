@@ -1,0 +1,159 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
+
+  <!-- Tabs -->
+  <div class="flex gap-4 mb-8 border-b">
+    <button (click)="tab = 'products'"
+      class="pb-3 px-1 font-medium transition"
+      [class.text-indigo-600]="tab === 'products'"
+      [class.border-b-2]="tab === 'products'"
+      [class.border-indigo-600]="tab === 'products'"
+      [class.text-gray-500]="tab !== 'products'">
+      Manage Products
+    </button>
+    <button (click)="tab = 'add'"
+      class="pb-3 px-1 font-medium transition"
+      [class.text-indigo-600]="tab === 'add'"
+      [class.border-b-2]="tab === 'add'"
+      [class.border-indigo-600]="tab === 'add'"
+      [class.text-gray-500]="tab !== 'add'">
+      Add Product
+    </button>
+  </div>
+
+  <!-- Add Product Tab -->
+  @if (tab === 'add') {
+    <div class="bg-white rounded-xl shadow-lg p-6 max-w-2xl">
+      <h2 class="font-semibold text-gray-800 mb-4">Add New Product</h2>
+
+      @if (formMessage) {
+        <div class="p-3 rounded-lg mb-4 text-sm"
+          [class.bg-green-50]="formMessage.includes('added')"
+          [class.text-green-600]="formMessage.includes('added')"
+          [class.bg-red-50]="!formMessage.includes('added')"
+          [class.text-red-600]="!formMessage.includes('added')">
+          {{ formMessage }}
+        </div>
+      }
+
+      <form (ngSubmit)="addProduct()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <select [(ngModel)]="selectedCategoryId" name="category" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option [ngValue]="null" disabled>Select a category</option>
+            @for (cat of categories; track cat.categoryId) {
+              <option [ngValue]="cat.categoryId">{{ cat.categoryName }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
+          <input type="text" [(ngModel)]="form.productName" name="productName" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+          <textarea [(ngModel)]="form.description" name="description" rows="3" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+            <input type="number" [(ngModel)]="form.price" name="price" required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Discount (%)</label>
+            <input type="number" [(ngModel)]="form.discount" name="discount"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+            <input type="number" [(ngModel)]="form.quantity" name="quantity" required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+          </div>
+        </div>
+        <button type="submit" [disabled]="formLoading"
+          class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-semibold disabled:opacity-50">
+          {{ formLoading ? 'Adding...' : 'Add Product' }}
+        </button>
+      </form>
+    </div>
+  }
+
+  <!-- Manage Products Tab -->
+  @if (tab === 'products') {
+    @if (loading) {
+      <div class="text-center py-20 text-gray-400">Loading...</div>
+    } @else if (products.length === 0) {
+      <div class="text-center py-20 text-gray-400">No products to manage.</div>
+    } @else {
+      <div class="bg-white rounded-xl shadow overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Product</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Price</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Discount</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Stock</th>
+              <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            @for (product of products; track product.productId) {
+              <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4">
+                  @if (editingProduct?.productId === product.productId) {
+                    <input type="text" [(ngModel)]="editingProduct!.productName"
+                      class="px-2 py-1 border rounded text-sm w-full" />
+                  } @else {
+                    <div class="font-medium text-gray-800">{{ product.productName }}</div>
+                    <div class="text-xs text-gray-400 truncate max-w-xs">{{ product.description }}</div>
+                  }
+                </td>
+                <td class="px-6 py-4">
+                  @if (editingProduct?.productId === product.productId) {
+                    <input type="number" [(ngModel)]="editingProduct!.price"
+                      class="px-2 py-1 border rounded text-sm w-20" />
+                  } @else {
+                    ${{ product.price }}
+                  }
+                </td>
+                <td class="px-6 py-4">
+                  @if (editingProduct?.productId === product.productId) {
+                    <input type="number" [(ngModel)]="editingProduct!.discount"
+                      class="px-2 py-1 border rounded text-sm w-16" />
+                  } @else {
+                    {{ product.discount }}%
+                  }
+                </td>
+                <td class="px-6 py-4">
+                  @if (editingProduct?.productId === product.productId) {
+                    <input type="number" [(ngModel)]="editingProduct!.quantity"
+                      class="px-2 py-1 border rounded text-sm w-16" />
+                  } @else {
+                    {{ product.quantity }}
+                  }
+                </td>
+                <td class="px-6 py-4 text-right">
+                  @if (editingProduct?.productId === product.productId) {
+                    <button (click)="saveEdit()" class="text-green-600 hover:text-green-700 text-sm mr-2">Save</button>
+                    <button (click)="cancelEdit()" class="text-gray-400 hover:text-gray-600 text-sm">Cancel</button>
+                  } @else {
+                    <label class="text-blue-600 hover:text-blue-700 text-sm mr-2 cursor-pointer">
+                      📷
+                      <input type="file" (change)="onImageSelected($event, product.productId)" accept="image/*" class="hidden" />
+                    </label>
+                    <button (click)="startEdit(product)" class="text-indigo-600 hover:text-indigo-700 text-sm mr-2">Edit</button>
+                    <button (click)="deleteProduct(product.productId)" class="text-red-500 hover:text-red-600 text-sm">Delete</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>

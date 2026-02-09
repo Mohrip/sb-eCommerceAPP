@@ -1,0 +1,81 @@
+<div class="max-w-3xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6">Checkout</h1>
+
+  @if (loading) {
+    <div class="text-center py-20 text-gray-400">Loading...</div>
+  } @else if (!cart || cart.products.length === 0) {
+    <div class="text-center py-20 text-gray-400">Your cart is empty.</div>
+  } @else {
+    @if (error) {
+      <div class="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm">{{ error }}</div>
+    }
+    @if (success) {
+      <div class="bg-green-50 text-green-600 p-4 rounded-lg mb-4 text-center">
+        <span class="text-3xl block mb-2">✅</span>
+        <p class="font-semibold">{{ success }}</p>
+      </div>
+    }
+
+    <!-- Order Summary -->
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="font-semibold text-gray-800 mb-4">Order Summary</h2>
+      @for (product of cart.products; track product.productId) {
+        <div class="flex justify-between py-2 border-b border-gray-100">
+          <span class="text-gray-700">{{ product.productName }} × {{ product.quantity }}</span>
+          <span class="text-gray-800 font-medium">${{ ((product.specialPrice || product.price) * product.quantity).toFixed(2) }}</span>
+        </div>
+      }
+      <div class="flex justify-between pt-4 text-lg font-bold">
+        <span>Total</span>
+        <span class="text-indigo-600">${{ cart.totalPrice.toFixed(2) }}</span>
+      </div>
+    </div>
+
+    <!-- Select Address -->
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="font-semibold text-gray-800 mb-4">Shipping Address</h2>
+      @if (addresses.length === 0) {
+        <p class="text-gray-400 text-sm">No addresses found. Please add an address first.</p>
+      } @else {
+        <div class="space-y-3">
+          @for (addr of addresses; track addr.addressId) {
+            <label class="flex items-start gap-3 p-3 border rounded-lg cursor-pointer hover:border-indigo-500 transition"
+              [class.border-indigo-500]="selectedAddressId === addr.addressId"
+              [class.bg-indigo-50]="selectedAddressId === addr.addressId">
+              <input type="radio" [value]="addr.addressId" [(ngModel)]="selectedAddressId" name="address"
+                class="mt-1" />
+              <div>
+                <p class="font-medium text-gray-800">{{ addr.street }}, {{ addr.buildingName }}</p>
+                <p class="text-sm text-gray-500">{{ addr.city }}, {{ addr.state }} {{ addr.zipCode }} · {{ addr.country }}</p>
+              </div>
+            </label>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Payment Method -->
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="font-semibold text-gray-800 mb-4">Payment Method</h2>
+      <div class="space-y-3">
+        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-indigo-500 transition"
+          [class.border-indigo-500]="paymentMethod === 'COD'"
+          [class.bg-indigo-50]="paymentMethod === 'COD'">
+          <input type="radio" value="COD" [(ngModel)]="paymentMethod" name="payment" />
+          <span class="font-medium text-gray-800">Cash on Delivery</span>
+        </label>
+        <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-indigo-500 transition"
+          [class.border-indigo-500]="paymentMethod === 'Card'"
+          [class.bg-indigo-50]="paymentMethod === 'Card'">
+          <input type="radio" value="Card" [(ngModel)]="paymentMethod" name="payment" />
+          <span class="font-medium text-gray-800">Credit / Debit Card</span>
+        </label>
+      </div>
+    </div>
+
+    <button (click)="placeOrder()" [disabled]="placing || !!success"
+      class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition font-semibold disabled:opacity-50">
+      {{ placing ? 'Placing Order...' : 'Place Order' }}
+    </button>
+  }
+</div>

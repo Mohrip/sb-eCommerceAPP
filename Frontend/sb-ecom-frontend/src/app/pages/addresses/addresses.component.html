@@ -1,0 +1,73 @@
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">My Addresses</h1>
+    <button (click)="openForm()" class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition text-sm font-medium">
+      + Add Address
+    </button>
+  </div>
+
+  <!-- Form Modal -->
+  @if (showForm) {
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+      <h3 class="font-semibold text-gray-800 mb-4">{{ editingId ? 'Edit Address' : 'New Address' }}</h3>
+      <form (ngSubmit)="saveAddress()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Street</label>
+          <input type="text" [(ngModel)]="form.street" name="street" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Building Name</label>
+          <input type="text" [(ngModel)]="form.buildingName" name="buildingName" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+          <input type="text" [(ngModel)]="form.city" name="city" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">State</label>
+          <input type="text" [(ngModel)]="form.state" name="state" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
+          <input type="text" [(ngModel)]="form.zipCode" name="zipCode" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+          <input type="text" [(ngModel)]="form.country" name="country" required
+            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" />
+        </div>
+        <div class="md:col-span-2 flex gap-3 justify-end">
+          <button type="button" (click)="closeForm()"
+            class="px-5 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+          <button type="submit"
+            class="bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition">Save</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (loading) {
+    <div class="text-center py-20 text-gray-400">Loading addresses...</div>
+  } @else if (addresses.length === 0) {
+    <div class="text-center py-20 text-gray-400">No addresses yet. Add one above!</div>
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      @for (addr of addresses; track addr.addressId) {
+        <div class="bg-white rounded-xl shadow p-5">
+          <p class="font-semibold text-gray-800">{{ addr.street }}, {{ addr.buildingName }}</p>
+          <p class="text-sm text-gray-500 mt-1">{{ addr.city }}, {{ addr.state }} {{ addr.zipCode }}</p>
+          <p class="text-sm text-gray-500">{{ addr.country }}</p>
+          <div class="flex gap-3 mt-3">
+            <button (click)="openForm(addr)" class="text-indigo-600 hover:underline text-sm">Edit</button>
+            <button (click)="deleteAddress(addr.addressId)" class="text-red-500 hover:underline text-sm">Delete</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

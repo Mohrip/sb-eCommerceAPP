@@ -1,0 +1,22 @@
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface SignupRequest {
+  username: string;
+  email: string;
+  password: string;
+  role?: string[];
+}
+
+export interface UserInfoResponse {
+  userId: number;
+  username: string;
+  roles: string[];
+  jwtToken: string;
+}
+
+export interface MessageResponse {
+  message: string;
+}
